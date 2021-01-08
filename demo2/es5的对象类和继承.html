@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title></title>
+  </head>
+  <body>
+      <script>
+          /*
+            ts的类的学习
+          */
+         /*es5 中的类*/
+         function Person(name,age) { // 构造函数
+            this.name = name  // 属性
+            this.age = age
+            this.run = function() { // 实例方法 需要先实例化对象之后再调用
+              console.log('run')
+            }
+         }
+         Person.getAge = function() { // 静态方法 不需要实例化之后再调用 直接Person.getAge()就可调用
+           console.log('我是静态方法')
+         }
+         const p = new Person('张三',20) //实例化
+         console.log(p.name + p.age) // 调用
+         // 原型链上扩展属性和方法 原型链上的属性会被多个实例共享 构造函数不会
+         Person.prototype.sex = '男'
+         Person.prototype.work = function() {
+           console.log(this.age)
+         }
+
+         // es5的继承 原型链+对象冒充的组合继承模式
+         // 对象冒充方式
+         function Web() {
+           Person.call(this) // 对象冒充继承了Person类
+         }
+         const w = new Web()
+         w.run() // 对象冒充继承了Person构造函数里的方法和属性 不能继承原型链上的方法和属性 w.work() 会报错
+
+         // 原型链继承方式
+         function Web2() {}
+         Web2.prototype = new Person() // 原型链继承 让Person 构造函数和原型链上的属性和方法都会挂载到Web2的原型链上 
+                                      // 问题： 实例化子类的时候 不能给父类传参
+         const ww = new Web2('王五', 25)
+         console.log(ww.name) // 会报undefined， 无法给父类传参
+
+         // 原型链+对象冒充的组合方式
+         function Web3(name,age) {
+           Person.call(this,name,age)
+         }
+         Web3.prototype = new Person()
+         const w3 = new Web3('赵四', 20)
+         console.log(w3.name)
+         w3.work()
+         // 因为组合模式中 对象冒充已经继承了构造函数中的属性和方法 原型链上就不用再继承 所有也可以像下面这样写
+         function Web4(name,age){
+           Person.call(this,name,age)
+         }
+         Web4.prototype = Person.prototype
+      </script>
+  </body>
+</html>
