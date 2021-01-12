@@ -65,11 +65,6 @@ function ajax(config) {
         }
     };
 }
-ajax({
-    type: 'get',
-    url: 'http://www.bai.com',
-    dataType: 'json'
-});
 var md5 = function (name, value) {
     return name + "\u7684\u503C\u662F" + value;
 };
@@ -203,3 +198,122 @@ var mi2 = new MinClass(['f', 'r', 'd', 'b']); // 实例化类 并且指定T代�
 console.log(mi.min());
 console.log(mi2.min());
 // 同一个类 可以传入不同的类型数据
+// 把类作为参数类型的泛型类
+/**
+ * 定义一个User类 这个的作用是映射数据库的字段
+ * 然后定义一个MysqlDb的类 这个类用于操作数据库
+ * 然后把User类作为参数传入到MysqlDb类中
+*/
+// 操作User表
+var User = /** @class */ (function () {
+    function User() {
+    }
+    return User;
+}());
+// 操作Articl表
+var Atricl = /** @class */ (function () {
+    function Atricl(params) {
+        this.title = params.title;
+        this.desc = params.desc;
+        this.status = params.status; // 如果没有指定status 为undefined类型 要判断status存不存先
+    }
+    return Atricl;
+}());
+// 修改为泛型类
+var MysqlDb = /** @class */ (function () {
+    function MysqlDb() {
+    }
+    MysqlDb.prototype.add = function (info) {
+        console.log(info);
+        return true;
+    };
+    MysqlDb.prototype.update = function (info, id) {
+        console.log(info);
+        console.log(id);
+        return true;
+    };
+    return MysqlDb;
+}());
+var u = new User();
+u.username = '张三';
+u.password = '123456';
+var sq = new MysqlDb(); // 对User类行进校验
+sq.add(u);
+var at = new Atricl({
+    title: '新闻',
+    desc: '国内新闻',
+    status: 1 // 可选参数
+});
+var sq1 = new MysqlDb(); // 对Atricl类行进校验
+sq1.add(at);
+sq1.update(at, 111);
+// 操作Mysql的类
+var Mysql = /** @class */ (function () {
+    function Mysql() {
+    }
+    Mysql.prototype.add = function (info) {
+        console.log(info);
+        return true;
+    };
+    Mysql.prototype.update = function (info, id) {
+        throw new Error("Method not implemented.");
+    };
+    Mysql.prototype.delete = function (id) {
+        throw new Error("Method not implemented.");
+    };
+    Mysql.prototype.get = function (id) {
+        throw new Error("Method not implemented.");
+    };
+    return Mysql;
+}());
+// 操作Mongdb的类
+var Mongdb = /** @class */ (function () {
+    function Mongdb() {
+    }
+    Mongdb.prototype.add = function (info) {
+        throw new Error("Method not implemented.");
+    };
+    Mongdb.prototype.update = function (info, id) {
+        throw new Error("Method not implemented.");
+    };
+    Mongdb.prototype.delete = function (id) {
+        throw new Error("Method not implemented.");
+    };
+    Mongdb.prototype.get = function (id) {
+        throw new Error("Method not implemented.");
+    };
+    return Mongdb;
+}());
+// 操作Mssql的类
+var Mssql = /** @class */ (function () {
+    function Mssql() {
+    }
+    Mssql.prototype.add = function (info) {
+        throw new Error("Method not implemented.");
+    };
+    Mssql.prototype.update = function (info, id) {
+        throw new Error("Method not implemented.");
+    };
+    Mssql.prototype.delete = function (id) {
+        throw new Error("Method not implemented.");
+    };
+    Mssql.prototype.get = function (id) {
+        throw new Error("Method not implemented.");
+    };
+    return Mssql;
+}());
+// 操作用户表
+var UserDb = /** @class */ (function () {
+    function UserDb(param) {
+        this.username = param.username;
+        this.password = param.password;
+    }
+    return UserDb;
+}());
+var user = new UserDb({
+    username: 'zhangsan',
+    password: '123456'
+});
+var mysql = new Mysql(); // 指定约束UserDb类
+mysql.add(user);
+// 其他操作类似

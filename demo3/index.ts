@@ -73,11 +73,11 @@ function ajax(config:Config):void{
         }
     }
 }
-ajax({ // data 可传可不传
-    type:'get',  
-    url:'http://www.bai.com',
-    dataType:'json'
-})
+// ajax({ // data 可传可不传
+//     type:'get',  
+//     url:'http://www.bai.com',
+//     dataType:'json'
+// })
 
 // 2 函数类型接口 对方法传入的参数以及返回值进行约束
 interface encrypt{
@@ -248,3 +248,152 @@ const mi2 = new MinClass<string>(['f','r','d','b']) // 实例化类 并且指定
 console.log(mi.min())
 console.log(mi2.min())
 // 同一个类 可以传入不同的类型数据
+
+// 把类作为参数类型的泛型类
+/**
+ * 定义一个User类 这个的作用是映射数据库的字段
+ * 然后定义一个MysqlDb的类 这个类用于操作数据库
+ * 然后把User类作为参数传入到MysqlDb类中
+*/
+// 操作User表
+class  User {
+    public username:string | undefined
+    public password:string | undefined
+}
+// 操作Articl表
+class Atricl {
+    public title:string | undefined
+    public desc:string | undefined
+    public status:number | undefined
+    constructor(params:{
+        title:string | undefined,
+        desc:string | undefined,
+        status?:number | undefined
+    }){
+        this.title = params.title
+        this.desc = params.desc
+        this.status = params.status  // 如果没有指定status 为undefined类型 要判断status存不存先
+    }
+}
+// 修改为泛型类
+class MysqlDb<T> {
+    add(info:T):boolean{
+        console.log(info)
+        return true
+    }
+    update(info:T,id:number):boolean{
+        console.log(info)
+        console.log(id)
+        return true
+    }
+}
+const u = new User()
+u.username = '张三'
+u.password = '123456'
+const sq = new MysqlDb<User>() // 对User类行进校验
+sq.add(u)
+
+const at = new Atricl({
+    title : '新闻',
+    desc : '国内新闻',
+    status : 1  // 可选参数
+})
+
+const sq1 = new MysqlDb<Atricl>() // 对Atricl类行进校验
+sq1.add(at)
+sq1.update(at,111)
+// 只用封装一次MysqlDb类 可以对不同的数据堃进行操作
+
+
+/**
+ * 类型 接口 类 泛型的综合使用
+ * 封装统一操作Mysql Mongdb Mssql的底层操作
+*/
+/**
+ * 功能：定义一个操作数据库的库 支持Mysql Mongdb Mssql
+ * 要求: Mysql Mongdb Mssql功能都一样 都有add update delete get方法
+ * 注意： 约束统一规范 注意代码重用
+ * 解决方案： 需要约束规范所以要定义接口 代码重用要用到泛型
+ * 
+*/
+
+// 定义接口
+interface DBI<T>{
+    add(info:T):boolean
+    update(info:T,id:number):boolean
+    delete(id:number):boolean
+    get(id:number):any[]
+}
+
+// 操作Mysql的类
+class Mysql<T> implements DBI<T>{
+    add(info: T): boolean {
+        console.log(info)
+        return true
+    }
+    update(info: T, id: number): boolean {
+        throw new Error("Method not implemented.")
+    }
+    delete(id: number): boolean {
+        throw new Error("Method not implemented.")
+    }
+    get(id: number): any[] {
+        throw new Error("Method not implemented.")
+    }
+    
+}
+
+// 操作Mongdb的类
+class Mongdb<T> implements DBI<T>{
+    add(info: T): boolean {
+        throw new Error("Method not implemented.")
+    }
+    update(info: T, id: number): boolean {
+        throw new Error("Method not implemented.")
+    }
+    delete(id: number): boolean {
+        throw new Error("Method not implemented.")
+    }
+    get(id: number): any[] {
+        throw new Error("Method not implemented.")
+    }
+    
+}
+
+// 操作Mssql的类
+class Mssql<T> implements DBI<T>{
+    add(info: T): boolean {
+        throw new Error("Method not implemented.")
+    }
+    update(info: T, id: number): boolean {
+        throw new Error("Method not implemented.")
+    }
+    delete(id: number): boolean {
+        throw new Error("Method not implemented.")
+    }
+    get(id: number): any[] {
+        throw new Error("Method not implemented.")
+    }
+    
+}
+
+// 操作用户表
+class UserDb {
+    public username:string
+    public password:string
+    constructor(param:{
+        username:string,
+        password:string
+    }) {
+        this.username = param.username
+        this.password = param.password
+    }
+}
+
+const user = new UserDb({
+    username:'zhangsan',
+    password:'123456'
+})
+const mysql = new Mysql<UserDb>() // 指定约束UserDb类
+mysql.add(user)
+// 其他操作类似
