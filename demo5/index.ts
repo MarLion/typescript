@@ -151,3 +151,36 @@ class HttpClient4{
 }
 const u4 = new HttpClient4()
 u4.getData(1,2,'3')
+
+// 4 方法参数装饰器   用的不是特别多
+/*
+    参数装饰器会在运行时当作函数被调用 为类的原型增加一些元素数据 传入以下3个参数：
+    1.对于静态成员来说是类的构造函数，对于实力成员是类的原型对象  
+    2.方法的名字
+    3.参数在函数参数列表中的索引
+*/
+function logParam(params:string){
+    return function(target:any,methodName:any,paramsIndex:any){ // target:原型对象  paramsName:方法的名字 paramsIndex：参数索引
+        console.log(target)
+        console.log(methodName)
+        console.log(paramsIndex)
+        target.say = params
+    }
+}
+class HttpClient5{
+    public url:string | undefined
+    getData(@logParam('uuid') uuid:any):void{ //在参数前调用
+        console.log(uuid)
+    }
+}
+
+const uuid:any = new HttpClient5()
+uuid.getData('123456')
+console.log(uuid.say)
+
+/**
+ * 装饰器的执行顺序 
+ * 
+ * 属性 > 方法 > 方法参数 > 类装饰器
+ * 如果有多个同类的装饰器 从后往前执行 先执行后面的
+ * */ 

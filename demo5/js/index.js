@@ -32,6 +32,9 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 // 1 类装饰器：类装饰器在类声明之前被声明（紧靠着类声明） 类装饰器应用于类构造函数，可以用来监视 修改或者替换类定义 传入一个参数
 // 定义装饰器
 function logclass(params) {
@@ -192,3 +195,38 @@ var HttpClient4 = /** @class */ (function () {
 }());
 var u4 = new HttpClient4();
 u4.getData(1, 2, '3');
+// 4 方法参数装饰器   用的不是特别多
+/*
+    参数装饰器会在运行时当作函数被调用 为类的原型增加一些元素数据 传入以下3个参数：
+    1.对于静态成员来说是类的构造函数，对于实力成员是类的原型对象
+    2.方法的名字
+    3.参数在函数参数列表中的索引
+*/
+function logParam(params) {
+    return function (target, methodName, paramsIndex) {
+        console.log(target);
+        console.log(methodName);
+        console.log(paramsIndex);
+        target.say = params;
+    };
+}
+var HttpClient5 = /** @class */ (function () {
+    function HttpClient5() {
+    }
+    HttpClient5.prototype.getData = function (uuid) {
+        console.log(uuid);
+    };
+    __decorate([
+        __param(0, logParam('uuid'))
+    ], HttpClient5.prototype, "getData", null);
+    return HttpClient5;
+}());
+var uuid = new HttpClient5();
+uuid.getData('123456');
+console.log(uuid.say);
+/**
+ * 装饰器的执行顺序
+ *
+ * 属性 > 方法 > 方法参数 > 类装饰器
+ * 如果有多个同类的装饰器 从后往前执行 先执行后面的
+ * */ 
